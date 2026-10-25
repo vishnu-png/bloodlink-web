@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodLink AI - Real-Time Emergency Coordination Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Global Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('portal-selector')">
+                <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold shadow-md shadow-red-200">
+                    <i data-lucide="droplet" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">BloodLink <span class="text-red-600">AI</span></h1>
+                    <p class="text-xs text-slate-500 font-medium" id="header-subtitle">Live Emergency Platform</p>
+                </div>
+            </div>
+
+            <!-- Header Right State -->
+            <div class="flex items-center space-x-3">
+                <div id="logged-user-chip" class="hidden flex items-center space-x-2 bg-slate-100 py-1.5 px-3 rounded-xl border border-slate-200 text-xs">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="font-bold text-slate-800" id="chip-user-name">User</span>
+                    <span class="px-2 py-0.5 rounded font-black uppercase text-red-600 bg-white shadow-sm" id="chip-user-role">Role</span>
+                </div>
+
+                <!-- Universal Edit Profile Button (Identical to Mobile App) -->
+                <button id="btn-top-edit-profile" onclick="openEditProfileModal()" class="hidden px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center space-x-1">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    <span>Edit Profile</span>
+                </button>
+
+                <button id="btn-top-logout" onclick="logout()" class="hidden px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl transition flex items-center space-x-1">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 1: PORTAL & ROLE SELECTOR -->
+        <!-- ================================================================= -->
+        <div id="screen-portal-selector" class="space-y-8 max-w-4xl mx-auto py-6">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase">Pure Production Architecture</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Select Dedicated Account Portal</h2>
+                <p class="text-xs text-slate-500">Every registration, edit, and requisition synchronizes live to Supabase PostgreSQL</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Donor Card -->
+                <div onclick="openRoleAuth('donor')" class="bg-white p-6 rounded-3xl border border-slate-200 hover:border-red-400 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Donor Portal</h3>
+                        <p class="text-xs text-slate-500 mt-1">Register blood group, live GPS location, respond to emergency dispatches.</p>
+                    </div>
+                    <div class="mt-6 text-xs font-bold text-red-600 flex items-center">
+                        <span>Sign In / Register</span> &rarr;
+                    </div>
+                </div>
+
+                <!-- Patient Card -->
+                <div onclick="openRoleAuth('patient')" class="bg-white p-6 rounded-3xl border border-slate-200 hover:border-blue-400 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="user" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Patient Portal</h3>
+                        <p class="text-xs text-slate-500 mt-1">Broadcast emergency blood requests, locate nearest cold vault banks.</p>
+                    </div>
+                    <div class="mt-6 text-xs font-bold text-blue-600 flex items-center">
+                        <span>Sign In / Register</span> &rarr;
+                    </div>
+                </div>
+
+                <!-- Hospital Card -->
+                <div onclick="openRoleAuth('hospital')" class="bg-white p-6 rounded-3xl border border-slate-200 hover:border-purple-400 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="building-2" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Hospital Portal</h3>
+                        <p class="text-xs text-slate-500 mt-1">Emergency surgery allocations, verify incoming requests, monitor dispatches.</p>
+                    </div>
+                    <div class="mt-6 text-xs font-bold text-purple-600 flex items-center">
+                        <span>Sign In / Register</span> &rarr;
+                    </div>
+                </div>
+
+                <!-- Blood Bank Card -->
+                <div onclick="openRoleAuth('blood_bank')" class="bg-white p-6 rounded-3xl border border-slate-200 hover:border-emerald-400 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="archive" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Blood Bank Portal</h3>
+                        <p class="text-xs text-slate-500 mt-1">Live vault inventory, FEFO blood unit tracking, atomic reservation locks.</p>
+                    </div>
+                    <div class="mt-6 text-xs font-bold text-emerald-600 flex items-center">
+                        <span>Sign In / Register</span> &rarr;
+                    </div>
+                </div>
+
+                <!-- Admin Card -->
+                <div onclick="openRoleAuth('admin')" class="bg-white p-6 rounded-3xl border border-slate-200 hover:border-amber-400 hover:shadow-xl transition cursor-pointer flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Admin Portal</h3>
+                        <p class="text-xs text-slate-500 mt-1">Platform-wide audit stream, shortage forecasts, entity verification.</p>
+                    </div>
+                    <div class="mt-6 text-xs font-bold text-amber-700 flex items-center">
+                        <span>Sign In / Register</span> &rarr;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 2: AUTHENTICATION (LOGIN & REGISTRATION) -->
+        <!-- ================================================================= -->
+        <div id="screen-auth" class="hidden max-w-md mx-auto py-8 space-y-6">
+            <button onclick="showScreen('portal-selector')" class="text-xs text-slate-500 hover:text-slate-800 flex items-center space-x-1 font-bold">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span>Switch Portal</span>
+            </button>
+
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+                <div class="text-center space-y-1">
+                    <span id="auth-role-tag" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase tracking-wider">Donor Portal</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-2">Account Authentication</h2>
+                    <p class="text-xs text-slate-400">Synchronized live with cloud Supabase database</p>
+                </div>
+
+                <!-- Auth Navigation Tabs -->
+                <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl text-xs font-bold text-center">
+                    <button id="tab-btn-login" onclick="toggleAuthTab('login')" class="py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition">Sign In</button>
+                    <button id="tab-btn-register" onclick="toggleAuthTab('register')" class="py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition">Create Account</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form id="form-login" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
+                        <input type="email" id="login-email" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500" placeholder="name@example.com" />
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-semibold text-slate-600 uppercase">Password</label>
+                            <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-red-600 hover:underline font-bold">Forgot Password?</button>
+                        </div>
+                        <input type="password" id="login-password" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-red-500" placeholder="••••••••" />
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition shadow-md shadow-red-200 flex items-center justify-center space-x-2">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="form-register" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name / Entity Name</label>
+                        <input type="text" id="reg-name" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="Your Full Name" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
+                            <input type="email" id="reg-email" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="name@example.com" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number</label>
+                            <input type="text" id="reg-phone" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="+91 98765 43210" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+                            <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="••••••••" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">City / Region</label>
+                            <input type="text" id="reg-city" value="Chennai" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" />
+                        </div>
+                    </div>
+
+                    <!-- Role-Specific Registration Fields -->
+                    <div id="reg-donor-fields" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Blood Group</label>
+                                <select id="reg-blood-group" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+                                    <option value="A+">A+</option><option value="A-">A-</option>
+                                    <option value="B+">B+</option><option value="B-">B-</option>
+                                    <option value="O+">O+</option><option value="O-">O-</option>
+                                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Weight (kg)</label>
+                                <input type="number" id="reg-weight" value="68" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reg-facility-fields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Medical License / Registration No.</label>
+                            <input type="text" id="reg-license" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm" placeholder="e.g. TN-MED-2026-99" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition shadow-md shadow-slate-300 flex items-center justify-center space-x-2">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Register Account</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 3: REAL DONOR DASHBOARD -->
+        <!-- ================================================================= -->
+        <div id="screen-donor" class="hidden space-y-8">
+            <div class="bg-gradient-to-r from-red-600 to-rose-700 text-white p-8 rounded-3xl shadow-lg flex justify-between items-center">
+                <div>
+                    <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider">Live Donor Account</span>
+                    <h2 class="text-3xl font-black mt-2" id="donor-dash-name">Donor</h2>
+                    <p class="text-red-100 text-xs mt-1">Blood Group: <strong id="donor-dash-bg" class="text-white text-base">O+</strong> • Verified in Supabase</p>
+                </div>
+                <div class="text-right">
+                    <button onclick="updateMyLocation()" class="px-3 py-2 bg-white text-red-600 text-xs font-bold rounded-xl shadow flex items-center space-x-1">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span>Update My GPS Location</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Donor Invitations -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900 text-lg">Live Transfusion Invitations Sent to You</h3>
+                    <button onclick="refreshDonorDashboard()" class="text-xs text-red-600 font-bold hover:underline">Refresh</button>
+                </div>
+                <div id="donor-invites-container" class="space-y-3">
+                    <p class="text-xs text-slate-400">Loading invitations from database...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 4: REAL PATIENT DASHBOARD (LIVE REQUESTS & GPS BANKS) -->
+        <!-- ================================================================= -->
+        <div id="screen-patient" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">Patient Portal</span>
+                    <h2 class="text-2xl font-black text-slate-900 mt-2" id="patient-dash-name">Patient</h2>
+                    <p class="text-xs text-slate-500">Create real blood requests and track nearest blood banks via GPS</p>
+                </div>
+                <button onclick="document.getElementById('patient-modal-req').classList.toggle('hidden')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Create Emergency Request</span>
+                </button>
+            </div>
+
+            <!-- New Request Form Modal -->
+            <div id="patient-modal-req" class="hidden bg-white p-6 rounded-3xl border border-blue-200 shadow-lg space-y-4">
+                <h3 class="font-bold text-slate-900 text-base">New Emergency Blood Request</h3>
+                <form id="form-patient-req" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Blood Group Needed</label>
+                        <select id="p-bg" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm">
+                            <option value="A+">A+</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B-">B-</option>
+                            <option value="O+">O+</option><option value="O-">O-</option>
+                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Units Needed</label>
+                        <input type="number" id="p-units" value="2" min="1" max="8" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Urgency Level</label>
+                        <select id="p-urgency" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm">
+                            <option value="critical">CRITICAL (<2h)</option>
+                            <option value="urgent" selected>URGENT (<6h)</option>
+                            <option value="routine">ROUTINE (<24h)</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Hospital Destination Address</label>
+                        <input type="text" id="p-address" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" placeholder="e.g. ICU Trauma Bay, Apollo Hospital, Chennai" />
+                    </div>
+                    <div class="sm:col-span-3">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition">Submit & Auto-Reserve from Bank Stock</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Live Requests Tracking -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 text-lg">Your Active Emergency Requisitions</h3>
+                    <div id="patient-live-reqs" class="space-y-3">
+                        <p class="text-xs text-slate-400">Loading live status...</p>
+                    </div>
+                </div>
+
+                <!-- Nearest Blood Banks via GPS -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 text-lg">Verified Blood Banks Nearby</h3>
+                    <div id="patient-nearby-banks" class="space-y-3">
+                        <p class="text-xs text-slate-400">Calculating GPS distances...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 5: REAL HOSPITAL DASHBOARD -->
+        <!-- ================================================================= -->
+        <div id="screen-hospital" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase">Hospital Trauma Bay</span>
+                    <h2 class="text-2xl font-black text-slate-900 mt-2" id="hosp-dash-name">Hospital</h2>
+                    <p class="text-xs text-slate-500">Emergency surgical stock allocation & patient request authorization</p>
+                </div>
+                <button onclick="refreshHospitalDashboard()" class="text-xs text-purple-600 font-bold hover:underline">Refresh Requests</button>
+            </div>
+
+            <!-- Pending Requests Approval Table -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-slate-900 text-lg">Patient Blood Requests Pending Hospital Action</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs divide-y divide-slate-100">
+                        <thead>
+                            <tr class="text-slate-400 font-semibold uppercase">
+                                <th class="py-2.5">Request ID</th>
+                                <th class="py-2.5">Blood Group</th>
+                                <th class="py-2.5">Units</th>
+                                <th class="py-2.5">Urgency</th>
+                                <th class="py-2.5">Status</th>
+                                <th class="py-2.5">Destination</th>
+                                <th class="py-2.5">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hosp-requests-table" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 6: REAL BLOOD BANK DASHBOARD (INVENTORY CRUD & FEFO) -->
+        <!-- ================================================================= -->
+        <div id="screen-blood_bank" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold uppercase">Blood Bank Storage</span>
+                    <h2 class="text-2xl font-black text-slate-900 mt-2" id="bank-dash-name">Blood Bank</h2>
+                    <p class="text-xs text-slate-500">Atomic inventory management and FEFO allocation tracking</p>
+                </div>
+                <button onclick="promptAddUnitLive()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Register Blood Unit to Inventory</span>
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900 text-lg">Real Blood Stock Units in Database</h3>
+                    <button onclick="refreshBankLedger()" class="text-xs text-emerald-600 font-bold hover:underline">Refresh Ledger</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs divide-y divide-slate-100">
+                        <thead>
+                            <tr class="text-slate-400 font-semibold uppercase">
+                                <th class="py-2.5">Unit Identifier</th>
+                                <th class="py-2.5">Blood Group</th>
+                                <th class="py-2.5">Volume</th>
+                                <th class="py-2.5">Expiry Date</th>
+                                <th class="py-2.5">Days Left</th>
+                                <th class="py-2.5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bank-live-units-table" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 7: REAL ADMIN DASHBOARD (SYSTEM HEALTH AUDIT) -->
+        <!-- ================================================================= -->
+        <div id="screen-admin" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold uppercase">Platform Administration</span>
+                <h2 class="text-2xl font-black text-slate-900 mt-2">Live System Health & Analytics</h2>
+                <p class="text-xs text-slate-500">Computed directly from actual database records in Supabase PostgreSQL</p>
+            </div>
+
+            <!-- Live Analytics Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="admin-live-metrics"></div>
+
+            <!-- Real-Time Activity Feed -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-slate-900 text-lg">Real-Time Platform Event Stream</h3>
+                <div id="admin-activity-stream" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- UNIVERSAL MODAL: REAL-TIME EDIT PROFILE (MATCHING MOBILE APP) -->
+        <!-- ================================================================= -->
+        <div id="modal-edit-profile" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white max-w-md w-full rounded-3xl shadow-2xl p-6 space-y-4 animate-in fade-in duration-200">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg" id="modal-edit-title">Edit Profile</h3>
+                    </div>
+                    <button onclick="closeEditProfileModal()" class="text-slate-400 hover:text-slate-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500">Update your registered contact and entity details. Changes synchronize instantly to the cloud database.</p>
+                <form id="form-edit-profile" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name / Entity Name</label>
+                        <input type="text" id="edit-fullname" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Contact Phone</label>
+                        <input type="text" id="edit-phone" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">City / Region</label>
+                        <input type="text" id="edit-city" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" />
+                    </div>
+                    <div id="edit-donor-fields" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Blood Group</label>
+                        <select id="edit-blood-group" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm">
+                            <option value="A+">A+</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B-">B-</option>
+                            <option value="O+">O+</option><option value="O-">O-</option>
+                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-3">
+                        <button type="button" onclick="closeEditProfileModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Cancel</button>
+                        <button type="submit" id="btn-save-profile" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- UNIVERSAL MODAL: FORGOT PASSWORD RESET (MATCHING MOBILE APP) -->
+        <!-- ================================================================= -->
+        <div id="modal-forgot-password" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white max-w-md w-full rounded-3xl shadow-2xl p-6 space-y-4 animate-in fade-in duration-200">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                            <i data-lucide="key" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-lg">Reset Password</h3>
+                    </div>
+                    <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-slate-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500">Enter your registered email address and new password to instantly update your credentials.</p>
+                <form id="form-forgot-password" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Registered Email Address</label>
+                        <input type="email" id="fp-email" required class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" placeholder="user@example.com" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">New Password</label>
+                        <input type="password" id="fp-password" required minlength="6" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" placeholder="••••••••" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Confirm New Password</label>
+                        <input type="password" id="fp-confirm" required minlength="6" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-sm" placeholder="••••••••" />
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-3">
+                        <button type="button" onclick="closeForgotPasswordModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Cancel</button>
+                        <button type="submit" id="btn-save-fp" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow">Reset Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        BloodLink AI Real-Time Production Engine &copy; 2026. Empowered by Supabase PostgreSQL, FastAPI, and Advanced Machine Learning.
+    </footer>
+
+    <script>
+        // Dynamic Host Detection: Automatically connects to backend on whichever laptop/IP it runs on
+        const API_HOST = (window.location.hostname && window.location.hostname !== "") ? window.location.hostname : "127.0.0.1";
+        const API_BASE = (window.location.protocol === "https:")
+            ? `${window.location.origin}`
+            : `http://${API_HOST}:8000`;
+
+        let activeRole = "donor";
+        let currentUser = null;
+
+        function showScreen(screenId) {
+            ['portal-selector', 'auth', 'donor', 'patient', 'hospital', 'blood_bank', 'admin'].forEach(s => {
+                const el = document.getElementById(`screen-${s}`);
+                if (el) el.classList.add("hidden");
+            });
+            const target = document.getElementById(`screen-${screenId}`);
+            if (target) target.classList.remove("hidden");
+
+            if (screenId === 'portal-selector') {
+                document.getElementById("logged-user-chip").classList.add("hidden");
+                document.getElementById("btn-top-edit-profile").classList.add("hidden");
+                document.getElementById("btn-top-logout").classList.add("hidden");
+                document.getElementById("header-subtitle").innerText = "Live Emergency Platform";
+            }
+        }
+
+        function openRoleAuth(role) {
+            activeRole = role;
+            document.getElementById("auth-role-tag").innerText = `${role.toUpperCase()} PORTAL`;
+            
+            // Toggle form fields
+            if (role === 'donor') {
+                document.getElementById("reg-donor-fields").classList.remove("hidden");
+                document.getElementById("reg-facility-fields").classList.add("hidden");
+            } else if (role === 'hospital' || role === 'blood_bank') {
+                document.getElementById("reg-donor-fields").classList.add("hidden");
+                document.getElementById("reg-facility-fields").classList.remove("hidden");
+            } else {
+                document.getElementById("reg-donor-fields").classList.add("hidden");
+                document.getElementById("reg-facility-fields").classList.add("hidden");
+            }
+
+            toggleAuthTab('login');
+            showScreen('auth');
+        }
+
+        function toggleAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById("form-login").classList.remove("hidden");
+                document.getElementById("form-register").classList.add("hidden");
+                document.getElementById("tab-btn-login").className = "py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition";
+                document.getElementById("tab-btn-register").className = "py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition";
+            } else {
+                document.getElementById("form-login").classList.add("hidden");
+                document.getElementById("form-register").classList.remove("hidden");
+                document.getElementById("tab-btn-register").className = "py-2.5 rounded-xl bg-white text-slate-900 shadow-sm transition";
+                document.getElementById("tab-btn-login").className = "py-2.5 rounded-xl text-slate-500 hover:text-slate-900 transition";
+            }
+        }
+
+        // 1. LOGIN SUBMIT
+        document.getElementById("form-login").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value.trim().toLowerCase();
+            const password = document.getElementById("login-password").value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password, expected_role: activeRole })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    return alert(data.detail || "Invalid email or password. Please verify your credentials and try again.");
+                }
+
+                currentUser = data.user;
+                initUserSession(currentUser);
+            } catch (err) {
+                alert("Connection failed to backend service.");
+            }
+        });
+
+        // 2. REGISTER SUBMIT
+        document.getElementById("form-register").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const payload = {
+                email: document.getElementById("reg-email").value.trim().toLowerCase(),
+                password: document.getElementById("reg-password").value,
+                full_name: document.getElementById("reg-name").value.trim(),
+                role: activeRole,
+                phone: document.getElementById("reg-phone").value.trim(),
+                city: document.getElementById("reg-city").value.trim(),
+                blood_group: document.getElementById("reg-blood-group") ? document.getElementById("reg-blood-group").value : "O+",
+                weight_kg: document.getElementById("reg-weight") ? parseFloat(document.getElementById("reg-weight").value) : 68.0,
+                license_number: document.getElementById("reg-license") ? document.getElementById("reg-license").value : null
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) return alert(data.detail || "Registration Failed");
+
+                alert("Registration successful! Your account is created in cloud Supabase.");
+                toggleAuthTab('login');
+                document.getElementById("login-email").value = payload.email;
+            } catch (err) {
+                alert(err.message || "Registration encountered an unexpected issue.");
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            showScreen('portal-selector');
+        }
+
+        function initUserSession(user) {
+            document.getElementById("logged-user-chip").classList.remove("hidden");
+            document.getElementById("btn-top-edit-profile").classList.remove("hidden");
+            document.getElementById("btn-top-logout").classList.remove("hidden");
+            document.getElementById("chip-user-name").innerText = user.full_name;
+            document.getElementById("chip-user-role").innerText = user.role.toUpperCase();
+            document.getElementById("header-subtitle").innerText = `${user.role.toUpperCase()} PORTAL`;
+
+            showScreen(user.role);
+
+            if (user.role === 'donor') refreshDonorDashboard();
+            if (user.role === 'patient') refreshPatientDashboard();
+            if (user.role === 'hospital') refreshHospitalDashboard();
+            if (user.role === 'blood_bank') refreshBankLedger();
+            if (user.role === 'admin') refreshAdminDashboard();
+        }
+
+        // ==========================================
+        // EDIT PROFILE MODAL LOGIC (IDENTICAL TO MOBILE)
+        // ==========================================
+        function openEditProfileModal() {
+            if (!currentUser) return;
+            document.getElementById("modal-edit-title").innerText = `Edit Profile (${currentUser.role.toUpperCase()})`;
+            document.getElementById("edit-fullname").value = currentUser.full_name || "";
+            document.getElementById("edit-phone").value = currentUser.phone || "";
+            document.getElementById("edit-city").value = currentUser.city || "Chennai";
+
+            if (currentUser.role === "donor") {
+                document.getElementById("edit-donor-fields").classList.remove("hidden");
+            } else {
+                document.getElementById("edit-donor-fields").classList.add("hidden");
+            }
+
+            document.getElementById("modal-edit-profile").classList.remove("hidden");
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById("modal-edit-profile").classList.add("hidden");
+        }
+
+        document.getElementById("form-edit-profile").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btn-save-profile");
+            btn.disabled = true;
+            btn.innerText = "Saving...";
+
+            const payload = {
+                user_id: currentUser.id,
+                full_name: document.getElementById("edit-fullname").value.trim(),
+                phone: document.getElementById("edit-phone").value.trim(),
+                city: document.getElementById("edit-city").value.trim(),
+                blood_group: (currentUser.role === "donor") ? document.getElementById("edit-blood-group").value : null
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/profile/update`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Update failed");
+
+                // Sync in-memory user
+                currentUser.full_name = payload.full_name;
+                currentUser.phone = payload.phone;
+                currentUser.city = payload.city;
+                document.getElementById("chip-user-name").innerText = currentUser.full_name;
+
+                if (currentUser.role === 'donor') {
+                    const bgEl = document.getElementById("donor-dash-bg");
+                    if (bgEl && payload.blood_group) bgEl.innerText = payload.blood_group;
+                    const nmEl = document.getElementById("donor-dash-name");
+                    if (nmEl) nmEl.innerText = currentUser.full_name;
+                } else if (currentUser.role === 'patient') {
+                    const nmEl = document.getElementById("patient-dash-name");
+                    if (nmEl) nmEl.innerText = currentUser.full_name;
+                } else if (currentUser.role === 'hospital') {
+                    const nmEl = document.getElementById("hosp-dash-name");
+                    if (nmEl) nmEl.innerText = currentUser.full_name;
+                } else if (currentUser.role === 'blood_bank') {
+                    const nmEl = document.getElementById("bank-dash-name");
+                    if (nmEl) nmEl.innerText = currentUser.full_name;
+                }
+
+                alert("Profile updated successfully in real time!");
+                closeEditProfileModal();
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Save Changes";
+            }
+        });
+
+        // ==========================================
+        // FORGOT PASSWORD MODAL LOGIC (IDENTICAL TO MOBILE)
+        // ==========================================
+        function openForgotPasswordModal() {
+            const currentLoginEmail = document.getElementById("login-email").value;
+            if (currentLoginEmail) {
+                document.getElementById("fp-email").value = currentLoginEmail;
+            }
+            document.getElementById("modal-forgot-password").classList.remove("hidden");
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById("modal-forgot-password").classList.add("hidden");
+        }
+
+        document.getElementById("form-forgot-password").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("fp-email").value.trim().toLowerCase();
+            const pass = document.getElementById("fp-password").value;
+            const confirm = document.getElementById("fp-confirm").value;
+
+            if (pass !== confirm) {
+                return alert("Passwords do not match. Please re-enter.");
+            }
+
+            const btn = document.getElementById("btn-save-fp");
+            btn.disabled = true;
+            btn.innerText = "Resetting...";
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, new_password: pass })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Reset failed");
+
+                alert(data.message || "Password updated successfully! You can now login.");
+                closeForgotPasswordModal();
+                document.getElementById("login-email").value = email;
+                document.getElementById("login-password").value = pass;
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Reset Password";
+            }
+        });
+
+        // DONOR FUNCTIONS
+        async function refreshDonorDashboard() {
+            if (!currentUser) return;
+            document.getElementById("donor-dash-name").innerText = currentUser.full_name;
+
+            const res = await fetch(`${API_BASE}/api/donor/live-data?donor_id=${currentUser.id}`);
+            const data = await res.json();
+
+            document.getElementById("donor-dash-bg").innerText = data.profile.blood_group;
+
+            const list = document.getElementById("donor-invites-container");
+            list.innerHTML = "";
+
+            if (data.invitations.length === 0) {
+                list.innerHTML = `<p class="p-4 text-center text-slate-400 text-xs">No pending emergency transfusion requests right now.</p>`;
+            } else {
+                data.invitations.forEach(inv => {
+                    list.innerHTML += `
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded uppercase">${inv.urgency}</span>
+                                <h4 class="font-bold text-slate-900 mt-1">${inv.units_needed} Units ${inv.blood_group} Needed</h4>
+                                <p class="text-xs text-slate-500">${inv.delivery_address} • Patient: ${inv.patient_name || 'Emergency Trauma'}</p>
+                                <p class="text-xs text-purple-600 font-bold mt-1">AI Match Score: ${(inv.ml_predicted_prob * 100).toFixed(1)}%</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="respondInvite('${inv.response_id}', 'accepted')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow">Accept</button>
+                                <button onclick="respondInvite('${inv.response_id}', 'declined')" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl">Decline</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        async function respondInvite(responseId, status) {
+            await fetch(`${API_BASE}/api/donor/respond`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ response_id: responseId, status })
+            });
+            alert(`Response recorded as '${status}'. Thank you for your service!`);
+            refreshDonorDashboard();
+        }
+
+        function updateMyLocation() {
+            if (!navigator.geolocation) return alert("Geolocation not supported by your browser.");
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                await fetch(`${API_BASE}/api/location/update`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: currentUser.id, latitude: pos.coords.latitude, longitude: pos.coords.longitude })
+                });
+                alert(`Live GPS updated in Supabase: Lat ${pos.coords.latitude.toFixed(4)}, Lon ${pos.coords.longitude.toFixed(4)}`);
+            }, () => alert("Could not fetch location. Ensure browser permissions are granted."));
+        }
+
+        // PATIENT FUNCTIONS
+        async function refreshPatientDashboard() {
+            if (!currentUser) return;
+            document.getElementById("patient-dash-name").innerText = currentUser.full_name;
+
+            const res = await fetch(`${API_BASE}/api/patient/live-data?patient_id=${currentUser.id}`);
+            const data = await res.json();
+            const list = document.getElementById("patient-live-reqs");
+            list.innerHTML = "";
+
+            if (data.requests.length === 0) {
+                list.innerHTML = `<p class="p-4 text-center text-slate-400 text-xs">No active requests found. Click "Create Emergency Request" above.</p>`;
+            } else {
+                data.requests.forEach(r => {
+                    list.innerHTML += `
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-blue-600 uppercase">${r.status}</span>
+                                <span class="text-slate-400">${new Date(r.created_at).toLocaleTimeString()}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 mt-1">${r.units_requested} Units ${r.blood_group}</h4>
+                            <p class="text-xs text-slate-500">${r.delivery_address}</p>
+                            <div class="mt-2 text-xs flex space-x-3">
+                                <span class="text-emerald-700 font-bold">Bank Stock Locked: ${r.units_allocated_from_stock} Units</span>
+                                <span class="text-purple-700 font-bold">Donors Accepted: ${r.donors_accepted}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            refreshNearbyBanks();
+        }
+
+        async function refreshNearbyBanks() {
+            const lat = currentUser ? (currentUser.latitude || 12.9716) : 12.9716;
+            const lon = currentUser ? (currentUser.longitude || 77.5946) : 77.5946;
+            const res = await fetch(`${API_BASE}/api/banks/nearby?latitude=${lat}&longitude=${lon}`);
+            const banks = await res.json();
+
+            const container = document.getElementById("patient-nearby-banks");
+            container.innerHTML = "";
+            if (banks.length === 0) {
+                container.innerHTML = `<p class="p-4 text-center text-slate-400 text-xs">No blood banks registered yet.</p>`;
+            } else {
+                banks.forEach(b => {
+                    container.innerHTML += `
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-slate-900">${b.name}</h4>
+                                <p class="text-xs text-slate-500">${b.address || 'Metropolis Center'} • ${b.hours || '24/7'}</p>
+                                <p class="text-xs text-blue-600 font-bold mt-1">Phone: ${b.phone}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-slate-800">${b.distance_km} km away</span>
+                                <p class="text-xs font-bold text-emerald-600 mt-0.5">${b.available_units} Units Stock</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        document.getElementById("form-patient-req").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const payload = {
+                requester_id: currentUser.id,
+                blood_group: document.getElementById("p-bg").value,
+                units_requested: parseInt(document.getElementById("p-units").value),
+                urgency: document.getElementById("p-urgency").value,
+                delivery_address: document.getElementById("p-address").value,
+                delivery_latitude: currentUser.latitude || 13.0827,
+                delivery_longitude: currentUser.longitude || 80.2707
+            };
+            const res = await fetch(`${API_BASE}/api/requests/create`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(`Request created! Reserved ${data.units_reserved_from_blood_banks} units from verified blood banks.`);
+            document.getElementById("patient-modal-req").classList.add("hidden");
+            refreshPatientDashboard();
+        });
+
+        // HOSPITAL FUNCTIONS
+        async function refreshHospitalDashboard() {
+            if (!currentUser) return;
+            document.getElementById("hosp-dash-name").innerText = currentUser.full_name;
+
+            const res = await fetch(`${API_BASE}/api/activity/realtime-feed`);
+            const events = await res.json();
+            const reqs = events.filter(e => e.type === 'request');
+
+            const tbody = document.getElementById("hosp-requests-table");
+            tbody.innerHTML = "";
+            if (reqs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-400">No requests pending hospital action.</td></tr>`;
+            } else {
+                reqs.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 font-mono">${r.id.slice(0, 8)}</td>
+                            <td class="py-2.5 font-bold text-red-600">${r.blood_group}</td>
+                            <td class="py-2.5">2 Units</td>
+                            <td class="py-2.5 uppercase font-bold text-xs">${r.meta}</td>
+                            <td class="py-2.5 text-xs text-blue-600 font-bold">Action Needed</td>
+                            <td class="py-2.5 text-xs">${r.label}</td>
+                            <td class="py-2.5">
+                                <div class="flex space-x-1">
+                                    <button onclick="approveRequest('${r.id}', 'approved')" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded">Approve</button>
+                                    <button onclick="approveRequest('${r.id}', 'rejected')" class="px-2 py-1 bg-slate-200 text-slate-700 font-bold rounded">Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        async function approveRequest(requestId, action) {
+            await fetch(`${API_BASE}/api/requests/hospital-approval`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ request_id: requestId, action, hospital_id: currentUser.id })
+            });
+            alert(`Request marked as ${action}. Patient has been notified.`);
+            refreshHospitalDashboard();
+        }
+
+        // BLOOD BANK FUNCTIONS
+        async function refreshBankLedger() {
+            if (!currentUser) return;
+            document.getElementById("bank-dash-name").innerText = currentUser.full_name;
+
+            const res = await fetch(`${API_BASE}/api/inventory/bank-ledger?bank_id=${currentUser.id}`);
+            const units = await res.json();
+            const tbody = document.getElementById("bank-live-units-table");
+            tbody.innerHTML = "";
+
+            if (units.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">No blood units in inventory. Click "Register Blood Unit" above to add.</td></tr>`;
+            } else {
+                units.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 font-mono font-bold">${u.unit_identifier}</td>
+                            <td class="py-2.5 font-bold text-red-600">${u.blood_group}</td>
+                            <td class="py-2.5">${u.volume_ml} mL</td>
+                            <td class="py-2.5">${u.expiry_date}</td>
+                            <td class="py-2.5 font-bold text-slate-700">${u.days_left} Days</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded text-xs font-bold ${u.status === 'available' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${u.status}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        async function promptAddUnitLive() {
+            const bg = prompt("Enter Blood Group (A+, A-, B+, B-, O+, O-, AB+, AB-):", "O+");
+            if (!bg) return;
+            const res = await fetch(`${API_BASE}/api/inventory/add`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ blood_bank_id: currentUser.id, blood_group: bg })
+            });
+            const data = await res.json();
+            alert(`Unit ${data.unit_identifier} saved directly into Supabase!`);
+            refreshBankLedger();
+        }
+
+        // ADMIN FUNCTIONS
+        async function refreshAdminDashboard() {
+            const resStats = await fetch(`${API_BASE}/api/ai/live-analytics`);
+            const stats = await resStats.json();
+
+            const grid = document.getElementById("admin-live-metrics");
+            grid.innerHTML = `
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
+                    <p class="text-xs uppercase text-slate-400 font-bold">Active Requests</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1">${stats.real_time_active_requests}</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
+                    <p class="text-xs uppercase text-slate-400 font-bold">Registered Donors</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1">${stats.total_registered_donors}</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
+                    <p class="text-xs uppercase text-slate-400 font-bold">Available Donors</p>
+                    <p class="text-2xl font-black text-emerald-600 mt-1">${stats.currently_available_donors}</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
+                    <p class="text-xs uppercase text-slate-400 font-bold">Sync Status</p>
+                    <p class="text-sm font-black text-blue-600 mt-2">LIVE SUPABASE</p>
+                </div>
+            `;
+
+            const resFeed = await fetch(`${API_BASE}/api/activity/realtime-feed`);
+            const feed = await resFeed.json();
+            const stream = document.getElementById("admin-activity-stream");
+            stream.innerHTML = "";
+
+            feed.forEach(item => {
+                stream.innerHTML += `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs">
+                        <span class="font-bold uppercase text-slate-800">${item.type}: ${item.label || item.id.slice(0, 8)} (${item.blood_group})</span>
+                        <span class="text-slate-400">${new Date(item.created_at).toLocaleTimeString()}</span>
+                    </div>
+                `;
+            });
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            showScreen('portal-selector');
+        });
+    </script>
+</body>
+</html>
