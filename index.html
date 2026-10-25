@@ -522,9 +522,10 @@
     <script>
         // Dynamic Host Detection: Automatically connects to backend on whichever laptop/IP it runs on
         const API_HOST = (window.location.hostname && window.location.hostname !== "") ? window.location.hostname : "127.0.0.1";
-        const API_BASE = (window.location.protocol === "https:")
-            ? `${window.location.origin}`
-            : `http://${API_HOST}:8000`;
+let API_BASE = "https://elsewhere-anthony-wing-assumed.trycloudflare.com";
+if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
+    API_BASE = "http://127.0.0.1:8000";
+}
 
         let activeRole = "donor";
         let currentUser = null;
